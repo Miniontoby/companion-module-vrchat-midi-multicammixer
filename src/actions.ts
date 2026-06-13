@@ -33,7 +33,7 @@ export function UpdateActions(self: ModuleInstance): void {
 				},
 			],
 			callback: async (action) => {
-				self.SetCurrentProgram(action.options.value - 1) // convert 1-based to 0-based
+				self.SetCurrentProgram(action.options.value)
 			},
 		},
 		set_preview: {
@@ -49,7 +49,7 @@ export function UpdateActions(self: ModuleInstance): void {
 				},
 			],
 			callback: async (action) => {
-				self.SetCurrentPreview(action.options.value - 1) // convert 1-based to 0-based
+				self.SetCurrentPreview(action.options.value)
 			},
 		},
 		cut: {
