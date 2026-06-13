@@ -19,8 +19,8 @@
 		"url": "git+https://github.com/miniontoby/companion-module-vrchat-midi-multicammixer.git"
 	},
 	"engines": {
-		"node": ">20.20",
-		"yarn": ">1"
+		"node": ">=20.20",
+		"yarn": ">=1"
 	},
 	"dependencies": {
 		"@companion-module/base": "~2.0.4",
