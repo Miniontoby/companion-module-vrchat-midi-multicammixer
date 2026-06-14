@@ -5,14 +5,14 @@
 	"name": "VRChat MIDI MultiCamMixer",
 	"shortname": "VRChat MultiCamMixer",
 	"description": "Controls CurrentProgram and CurrentPreview in a VRChat world via MIDI.",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"license": "MIT",
 	"repository": "git+https://github.com/miniontoby/companion-module-vrchat-midi-multicammixer.git",
 	"bugs": "https://github.com/miniontoby/companion-module-vrchat-midi-multicammixer/issues",
 	"maintainers": [
 		{
 			"name": "Miniontoby",
-			"email": "noemail@mail.com"
+			"email": "47940064+Miniontoby@users.noreply.github.com"
 		}
 	],
 	"runtime": {

@@ -56,6 +56,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 	async destroy(): Promise<void> {
 		if (this.watchdogInterval) clearInterval(this.watchdogInterval)
+		if (this.logStream) this.logStream = null
 		if (this.midiOutput) this.midiOutput.close()
 		this.log('debug', `${this.id} destroyed`)
 	}
@@ -170,7 +171,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 	_SendMidiControl(code: number): void {
 		if (!this.midiOutput?.isPortOpen()) return
-		this.log('debug', `Sending CC ch${CONTROL_CHANNEL} note${CONTROL_NOTE} val${code}`)
+		// this.log('debug', `Sending CC ch${CONTROL_CHANNEL} note${CONTROL_NOTE} val${code}`)
 		this.midiOutput.sendMessage([0xb0 | (CONTROL_CHANNEL & 0xf), CONTROL_NOTE, code & 0x7f])
 	}
 
@@ -197,7 +198,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			fs.closeSync(fd)
 			this.logStream.bytesRead += newBytes
 
-			return buf.includes('MIDIMIXERREADY')
+			return buf.includes('MIXERREADY')
 		} catch {
 			return false
 		}
