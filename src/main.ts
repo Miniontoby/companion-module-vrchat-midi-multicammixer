@@ -82,7 +82,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			return
 		}
 
-		this.updateStatus(InstanceStatus.Ok)
 		this.start()
 	}
 
@@ -114,17 +113,15 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	SetCurrentProgram(index: number): void {
-		this.CurrentProgram = Math.min(index, 50)
-		this._SendChannelValue(0, this.CurrentProgram)
-		this.setVariableValues({ current_program: this.CurrentProgram })
-		this.checkFeedbacks('program_active')
+		const CurrentProgram = Math.min(index, 50)
+		this._SendChannelValue(0, CurrentProgram)
+		// this._setCurrentProgramVariable(CurrentProgram) // Let the callback set the value instead!
 	}
 
 	SetCurrentPreview(index: number): void {
-		this.CurrentPreview = Math.min(index, 50)
-		this._SendChannelValue(1, this.CurrentPreview)
-		this.setVariableValues({ current_preview: this.CurrentPreview })
-		this.checkFeedbacks('preview_active')
+		const CurrentPreview = Math.min(index, 50)
+		this._SendChannelValue(1, CurrentPreview)
+		// this._setCurrentPreviewVariable(CurrentPreview) // Let the callback set the value instead!
 	}
 
 	Cut(): void {
@@ -143,22 +140,29 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			if (!this.getVariableValue('connected')) {
 				this.setVariableValues({ connected: true })
 				this.checkFeedbacks('connected')
+				this.updateStatus(InstanceStatus.Ok)
 			}
 		} else {
 			const elapsed = (Date.now() - this.lastUpdate) / 1000
 			if (elapsed > 1) {
 				this.lastUpdate = Date.now()
 				this._Reset()
-
-				if (this.getVariableValue('connected')) {
-					this.setVariableValues({ connected: false })
-					this.checkFeedbacks('connected')
-				}
 			}
 		}
 	}
 
 	_Reset(): void {
+		if ((this.getVariableValue('current_program') ?? 0) > 0) {
+			this._setCurrentProgramVariable(0)
+		}
+		if ((this.getVariableValue('current_preview') ?? 0) > 0) {
+			this._setCurrentPreviewVariable(0)
+		}
+		if (this.getVariableValue('connected')) {
+			this.setVariableValues({ connected: false })
+			this.checkFeedbacks('connected')
+		}
+		this.updateStatus(InstanceStatus.Connecting)
 		this._findVRCLog()
 		this._midiKnock()
 		this._midiWatchdog()
@@ -185,6 +189,18 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this._SendMidiControl(127) // Watchdog
 	}
 
+	_setCurrentProgramVariable(programValue: number): void {
+		this.CurrentProgram = programValue
+		this.setVariableValues({ current_program: programValue })
+		this.checkFeedbacks('program_active')
+	}
+
+	_setCurrentPreviewVariable(previewValue: number): void {
+		this.CurrentPreview = previewValue
+		this.setVariableValues({ current_preview: previewValue })
+		this.checkFeedbacks('preview_active')
+	}
+
 	_isMidiReady(): boolean {
 		if (!this.logStream || !this.midiOutput?.isPortOpen()) return false
 		try {
@@ -198,7 +214,15 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			fs.closeSync(fd)
 			this.logStream.bytesRead += newBytes
 
-			return buf.includes('MIXERREADY')
+			const text = buf.toString('utf8')
+
+			const programMatch = text.match(/\[MIDIMultiCamMixer\] CurrentProgram: (\d+)/)
+			if (programMatch) this._setCurrentProgramVariable(parseInt(programMatch[1], 10))
+
+			const previewMatch = text.match(/\[MIDIMultiCamMixer\] CurrentPreview: (\d+)/)
+			if (previewMatch) this._setCurrentPreviewVariable(parseInt(previewMatch[1], 10))
+
+			return text.includes('MIXERREADY')
 		} catch {
 			return false
 		}
@@ -208,19 +232,25 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.logStream = null
 		const vrcPath = path.join(os.homedir(), 'AppData', 'LocalLow', 'VRChat', 'VRChat')
 		let logs: string[] = []
-		try {
-			logs = fs
-				.readdirSync(vrcPath)
-				.filter((f) => f.match(/^output_log_.*\.txt$/))
-				.map((f) => path.join(vrcPath, f))
-				.sort()
-		} catch {
-			/* empty */
+
+		if (this.config.useEditorLog) {
+			const vrcEditorPath = path.join(os.homedir(), 'AppData', 'Local', 'Unity', 'Editor', 'Editor.log')
+			if (fs.existsSync(vrcEditorPath)) logs = [vrcEditorPath]
+		} else {
+			try {
+				logs = fs
+					.readdirSync(vrcPath)
+					.filter((f) => f.match(/^output_log_.*\.txt$/))
+					.map((f) => path.join(vrcPath, f))
+					.sort()
+			} catch {
+				/* empty */
+			}
 		}
 
-		if (logs.length === 0) return
-		if (this.config.useEditorLog) {
-			logs[logs.length - 1] = path.join(os.homedir(), 'AppData', 'Local', 'Unity', 'Editor', 'Editor.log')
+		if (logs.length === 0) {
+			this.updateStatus(InstanceStatus.ConnectionFailure, 'Cannot find/read logs')
+			return
 		}
 
 		const latest = logs[logs.length - 1]

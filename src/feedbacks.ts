@@ -15,9 +15,7 @@ export type FeedbacksSchema = {
 	}
 	connected: {
 		type: 'boolean'
-		options: {
-			_: null
-		}
+		options: Record<string, never>
 	}
 }
 

@@ -12,9 +12,13 @@ export type ActionsSchema = {
 		}
 	}
 	cut: {
-		options: {
-			_: null
-		}
+		options: Record<string, never>
+	}
+	auto: {
+		options: Record<string, never>
+	}
+	reset: {
+		options: Record<string, never>
 	}
 }
 
@@ -57,6 +61,20 @@ export function UpdateActions(self: ModuleInstance): void {
 			options: [],
 			callback: async () => {
 				self.Cut()
+			},
+		},
+		auto: {
+			name: 'Auto (swap Program and Preview)',
+			options: [],
+			callback: async () => {
+				self.Cut() // TODO still need to implement Auto transitions, either Unity side, or this side
+			},
+		},
+		reset: {
+			name: 'Reset',
+			options: [],
+			callback: async () => {
+				self._Reset()
 			},
 		},
 	})

@@ -15,10 +15,10 @@ export function UpdatePresets(self: ModuleInstance): void {
 					presets: ['connected'],
 				},
 				{
-					id: 'cut',
+					id: 'actions',
 					type: 'simple',
-					name: 'Cut',
-					presets: ['cut'],
+					name: 'Actions',
+					presets: ['cut', 'auto', 'reset'],
 				},
 				{
 					id: 'camera',
@@ -45,9 +45,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 		feedbacks: [
 			{
 				feedbackId: 'connected',
-				options: {
-					_: null,
-				},
+				options: {},
 				style: {
 					text: 'VRC\\nLIVE',
 					color: 0xffffff,
@@ -62,7 +60,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 		name: 'Cut',
 		style: {
 			text: 'CUT',
-			size: 'auto',
+			size: '24',
 			color: 0xffffff,
 			bgcolor: 0xb40000,
 			show_topbar: false,
@@ -72,9 +70,55 @@ export function UpdatePresets(self: ModuleInstance): void {
 				down: [
 					{
 						actionId: 'cut',
-						options: {
-							_: null,
-						},
+						options: {},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['auto'] = {
+		type: 'simple',
+		name: 'Auto',
+		style: {
+			text: 'AUTO',
+			size: '24',
+			color: 0xffffff,
+			bgcolor: 0xb40000,
+			show_topbar: false,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'auto',
+						options: {},
+					},
+				],
+				up: [],
+			},
+		],
+		feedbacks: [],
+	}
+
+	presets['reset'] = {
+		type: 'simple',
+		name: 'Reset',
+		style: {
+			text: 'Reset',
+			size: '24',
+			color: 0xffffff,
+			bgcolor: 0x000000,
+			show_topbar: false,
+		},
+		steps: [
+			{
+				down: [
+					{
+						actionId: 'reset',
+						options: {},
 					},
 				],
 				up: [],
@@ -86,7 +130,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 	for (let i = 1; i <= 8; i++) {
 		presets['camera_' + String(i)] = {
 			type: 'simple',
-			name: 'VRChat Camera' + String(i),
+			name: 'Camera ' + String(i),
 			style: {
 				text: 'Cam ' + String(i),
 				size: '18',
