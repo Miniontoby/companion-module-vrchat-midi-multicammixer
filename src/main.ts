@@ -26,7 +26,7 @@ const CONTROL_NOTE = 126
 export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	config!: ModuleConfig // Setup in init()
 	midiOutput: Output | null
-	logStream: { path: string; bytesRead: number } | null
+	logStream: { path: string; bytesRead: number } | false | null
 	lastUpdate: number
 	watchdogInterval: NodeJS.Timeout | number | null
 	CurrentProgram: number
@@ -152,6 +152,10 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	_Reset(): void {
+		if (this.logStream === false) return; // kind of check if we're already trying to connect
+
+		this.logStream = false
+
 		if ((this.getVariableValue('current_program') ?? 0) > 0) {
 			this._setCurrentProgramVariable(0)
 		}
@@ -162,10 +166,13 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this.setVariableValues({ connected: false })
 			this.checkFeedbacks('connected')
 		}
-		this.updateStatus(InstanceStatus.Connecting)
-		this._findVRCLog()
-		this._midiKnock()
-		this._midiWatchdog()
+
+		setTimeout(() => {
+			this.updateStatus(InstanceStatus.Connecting)
+			this._findVRCLog()
+			this._midiKnock()
+			this._midiWatchdog()
+		}, 5e3); // 5 seconds else it doesnt actually reset
 	}
 
 	_SendChannelValue(isPreview: number, index: number): void {
@@ -186,6 +193,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	_midiWatchdog(): void {
+		if (!this.logStream || !this.midiOutput?.isPortOpen()) return
 		this._SendMidiControl(127) // Watchdog
 	}
 
@@ -216,11 +224,11 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 			const text = buf.toString('utf8')
 
-			const programMatch = text.match(/\[MIDIMultiCamMixer\] CurrentProgram: (\d+)/)
-			if (programMatch) this._setCurrentProgramVariable(parseInt(programMatch[1], 10))
+			const programMatch = Array.from(text.matchAll(/\[MIDIMultiCamMixer\] CurrentProgram: (\d+)/g))
+			if (programMatch.length > 0) this._setCurrentProgramVariable(parseInt(programMatch[programMatch.length - 1][1], 10)) // grab last
 
-			const previewMatch = text.match(/\[MIDIMultiCamMixer\] CurrentPreview: (\d+)/)
-			if (previewMatch) this._setCurrentPreviewVariable(parseInt(previewMatch[1], 10))
+			const previewMatch = Array.from(text.matchAll(/\[MIDIMultiCamMixer\] CurrentPreview: (\d+)/g))
+			if (previewMatch.length > 0) this._setCurrentPreviewVariable(parseInt(previewMatch[previewMatch.length - 1][1], 10)) // grab last
 
 			return text.includes('MIXERREADY')
 		} catch {

@@ -26,8 +26,8 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			description: 'Active when the given input is the current Program output',
 			type: 'boolean',
 			defaultStyle: {
-				bgcolor: 0xff0000,
 				color: 0xffffff,
+				bgcolor: 0xff0000,
 			},
 			options: [
 				{
@@ -48,8 +48,8 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			description: 'Active when the given input is the current Preview output',
 			type: 'boolean',
 			defaultStyle: {
-				bgcolor: 0x00ff00,
 				color: 0x000000,
+				bgcolor: 0x00ff00,
 			},
 			options: [
 				{
@@ -70,8 +70,8 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			description: 'Active when the module is connected and sending data to a VRChat world',
 			type: 'boolean',
 			defaultStyle: {
-				bgcolor: 0x00ff00,
 				color: 0x000000,
+				bgcolor: 0x00ff00,
 			},
 			options: [],
 			callback: () => {

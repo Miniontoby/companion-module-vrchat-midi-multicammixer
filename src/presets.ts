@@ -21,7 +21,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 					presets: ['cut', 'auto', 'reset'],
 				},
 				{
-					id: 'camera',
+					id: 'cameras',
 					type: 'simple',
 					name: 'Cameras',
 					presets: ['camera_1', 'camera_2', 'camera_3', 'camera_4', 'camera_5', 'camera_6', 'camera_7', 'camera_8'],
@@ -36,10 +36,9 @@ export function UpdatePresets(self: ModuleInstance): void {
 		name: 'VRChat Connection Indicator',
 		style: {
 			text: 'VRC\\nDISC',
-			size: 'auto',
+			size: '24',
 			color: 0xffffff,
-			bgcolor: 0x000000,
-			show_topbar: false,
+			bgcolor: 0xb40000,
 		},
 		steps: [],
 		feedbacks: [
@@ -48,8 +47,8 @@ export function UpdatePresets(self: ModuleInstance): void {
 				options: {},
 				style: {
 					text: 'VRC\\nLIVE',
-					color: 0xffffff,
-					bgcolor: 0x00b400,
+					color: 0x000000,
+					bgcolor: 0x00ff00,
 				},
 			},
 		],
@@ -62,8 +61,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			text: 'CUT',
 			size: '24',
 			color: 0xffffff,
-			bgcolor: 0xb40000,
-			show_topbar: false,
+			bgcolor: 0x000000,
 		},
 		steps: [
 			{
@@ -76,7 +74,16 @@ export function UpdatePresets(self: ModuleInstance): void {
 				up: [],
 			},
 		],
-		feedbacks: [],
+		feedbacks: [
+			{
+				feedbackId: 'connected',
+				options: {},
+				style: {
+					color: 0x000000,
+					bgcolor: 0xff0000,
+				},
+			},
+		],
 	}
 
 	presets['auto'] = {
@@ -86,8 +93,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			text: 'AUTO',
 			size: '24',
 			color: 0xffffff,
-			bgcolor: 0xb40000,
-			show_topbar: false,
+			bgcolor: 0x000000,
 		},
 		steps: [
 			{
@@ -100,7 +106,16 @@ export function UpdatePresets(self: ModuleInstance): void {
 				up: [],
 			},
 		],
-		feedbacks: [],
+		feedbacks: [
+			{
+				feedbackId: 'connected',
+				options: {},
+				style: {
+					color: 0x000000,
+					bgcolor: 0xb40000,
+				},
+			},
+		],
 	}
 
 	presets['reset'] = {
@@ -111,7 +126,6 @@ export function UpdatePresets(self: ModuleInstance): void {
 			size: '24',
 			color: 0xffffff,
 			bgcolor: 0x000000,
-			show_topbar: false,
 		},
 		steps: [
 			{
@@ -124,19 +138,27 @@ export function UpdatePresets(self: ModuleInstance): void {
 				up: [],
 			},
 		],
-		feedbacks: [],
+		feedbacks: [
+			{
+				feedbackId: 'connected',
+				options: {},
+				style: {
+					color: 0x000000,
+					bgcolor: 0xb8b8b8,
+				},
+			},
+		],
 	}
 
 	for (let i = 1; i <= 8; i++) {
-		presets['camera_' + String(i)] = {
+		presets[`camera_${i}`] = {
 			type: 'simple',
-			name: 'Camera ' + String(i),
+			name: `Camera ${i}`,
 			style: {
-				text: 'Cam ' + String(i),
+				text: `Cam ${i}`,
 				size: '18',
 				color: 0xffffff,
 				bgcolor: 0x000000,
-				show_topbar: false,
 			},
 			steps: [
 				{
@@ -153,13 +175,21 @@ export function UpdatePresets(self: ModuleInstance): void {
 			],
 			feedbacks: [
 				{
+					feedbackId: 'connected',
+					options: {},
+					style: {
+						color: 0x000000,
+						bgcolor: 0xb8b8b8,
+					},
+				},
+				{
 					feedbackId: 'preview_active',
 					options: {
 						value: i,
 					},
 					style: {
-						bgcolor: 0x00ff00,
 						color: 0x000000,
+						bgcolor: 0x00ff00,
 					},
 				},
 				{
@@ -168,8 +198,8 @@ export function UpdatePresets(self: ModuleInstance): void {
 						value: i,
 					},
 					style: {
-						bgcolor: 0xff0000,
 						color: 0xffffff,
+						bgcolor: 0xff0000,
 					},
 				},
 			],

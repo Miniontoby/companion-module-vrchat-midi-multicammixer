@@ -1,5 +1,4 @@
 import { type DropdownChoice, type SomeCompanionConfigField } from '@companion-module/base'
-
 import { getOutputs } from './midi/midi.js'
 
 export type ModuleConfig = {
