@@ -107,8 +107,10 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 	start(): void {
 		this.log('debug', '\nEntering *main*\n')
+		this.updateStatus(InstanceStatus.Connecting)
 		this._findVRCLog()
-		this._Reset()
+		this._midiKnock()
+		this._midiWatchdog()
 		this.watchdogInterval = setInterval(() => this._Tick(), 100)
 	}
 
@@ -152,7 +154,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	_Reset(): void {
-		if (this.logStream === false) return; // kind of check if we're already trying to connect
+		// kind of check if we're already trying to connect
+		if (this.logStream === false) return
 
 		this.logStream = false
 
@@ -172,7 +175,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this._findVRCLog()
 			this._midiKnock()
 			this._midiWatchdog()
-		}, 5e3); // 5 seconds else it doesnt actually reset
+		}, 5e3) // 5 seconds else it doesnt actually reset
 	}
 
 	_SendChannelValue(isPreview: number, index: number): void {
@@ -225,10 +228,12 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			const text = buf.toString('utf8')
 
 			const programMatch = Array.from(text.matchAll(/\[MIDIMultiCamMixer\] CurrentProgram: (\d+)/g))
-			if (programMatch.length > 0) this._setCurrentProgramVariable(parseInt(programMatch[programMatch.length - 1][1], 10)) // grab last
+			if (programMatch.length > 0)
+				this._setCurrentProgramVariable(parseInt(programMatch[programMatch.length - 1][1], 10)) // grab last
 
 			const previewMatch = Array.from(text.matchAll(/\[MIDIMultiCamMixer\] CurrentPreview: (\d+)/g))
-			if (previewMatch.length > 0) this._setCurrentPreviewVariable(parseInt(previewMatch[previewMatch.length - 1][1], 10)) // grab last
+			if (previewMatch.length > 0)
+				this._setCurrentPreviewVariable(parseInt(previewMatch[previewMatch.length - 1][1], 10)) // grab last
 
 			return text.includes('MIXERREADY')
 		} catch {

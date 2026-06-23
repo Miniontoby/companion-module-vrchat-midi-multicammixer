@@ -1,13 +1,13 @@
 {
 	"name": "vrchat-midi-multicammixer",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
 		"postinstall": "husky",
 		"format": "prettier -w .",
-		"package": "yarn build && companion-module-build",
-		"build": "rimraf dist && yarn build:main",
+		"package": "run build && companion-module-build",
+		"build": "rimraf dist && run build:main",
 		"build:main": "tsc -p tsconfig.build.json",
 		"dev": "tsc -p tsconfig.build.json --watch",
 		"lint:raw": "eslint",
@@ -19,8 +19,8 @@
 		"url": "git+https://github.com/miniontoby/companion-module-vrchat-midi-multicammixer.git"
 	},
 	"engines": {
-		"node": ">=20.20",
-		"yarn": ">=1"
+		"node": "^22.20",
+		"yarn": "^4"
 	},
 	"dependencies": {
 		"@companion-module/base": "~2.0.4",
@@ -45,5 +45,6 @@
 		"*.{ts,tsx,js,jsx}": [
 			"yarn lint:raw --fix"
 		]
-	}
+	},
+	"packageManager": "yarn@4.17.0"
 }
